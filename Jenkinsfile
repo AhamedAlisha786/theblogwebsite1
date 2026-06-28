@@ -12,23 +12,16 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 git branch: 'main',
-                url: 'https://github.com/AhamedAlisha786/theblogwebsite1.git'
+                    url: 'https://github.com/AhamedAlisha786/theblogwebsite1.git'
             }
         }
-
-        // stage('Build Backend') {
-        //     steps {
-        //         dir('backend') {
-        //             sh 'chmod +x mvnw || true'
-        //             sh './mvnw clean package -DskipTests || mvn clean package -DskipTests'
-        //         }
-        //     }
-        // }
 
         stage('Build Backend Docker Image') {
             steps {
                 dir('Blog_website') {
-                    sh 'sudo docker build -t $BACKEND_IMAGE:latest .'
+                    sh '''
+                        sudo docker build -t $BACKEND_IMAGE:latest .
+                    '''
                 }
             }
         }
@@ -36,7 +29,9 @@ pipeline {
         stage('Build Frontend Docker Image') {
             steps {
                 dir('clear-slate-blog') {
-                    sh 'sudo docker build -t $FRONTEND_IMAGE:latest .'
+                    sh '''
+                        sudo docker build -t $FRONTEND_IMAGE:latest .
+                    '''
                 }
             }
         }
@@ -48,28 +43,34 @@ pipeline {
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    sh '''
+                        echo "$DOCKER_PASS" | sudo docker login \
+                        -u "$DOCKER_USER" --password-stdin
+                    '''
                 }
             }
         }
 
         stage('Push Backend Image') {
             steps {
-                sh 'sudo docker push $BACKEND_IMAGE:latest'
+                sh '''
+                    sudo docker push $BACKEND_IMAGE:latest
+                '''
             }
         }
 
         stage('Push Frontend Image') {
             steps {
-                sh 'sudo docker push $FRONTEND_IMAGE:latest'
+                sh '''
+                    sudo docker push $FRONTEND_IMAGE:latest
+                '''
             }
         }
-
     }
 
     post {
         always {
-            sh 'docker logout'
+            sh 'sudo docker logout'
         }
 
         success {
