@@ -12,23 +12,23 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 git branch: 'main',
-                url: 'https://github.com/AhamedAlisha786/Devoops.git'
+                url: 'https://github.com/AhamedAlisha786/theblogwebsite1.git'
             }
         }
 
-        stage('Build Backend') {
-            steps {
-                dir('backend') {
-                    sh 'chmod +x mvnw || true'
-                    sh './mvnw clean package -DskipTests || mvn clean package -DskipTests'
-                }
-            }
-        }
+        // stage('Build Backend') {
+        //     steps {
+        //         dir('backend') {
+        //             sh 'chmod +x mvnw || true'
+        //             sh './mvnw clean package -DskipTests || mvn clean package -DskipTests'
+        //         }
+        //     }
+        // }
 
         stage('Build Backend Docker Image') {
             steps {
                 dir('Blog_website') {
-                    sh 'docker build -t $BACKEND_IMAGE:latest .'
+                    sh 'sudo docker build -t $BACKEND_IMAGE:latest .'
                 }
             }
         }
@@ -36,7 +36,7 @@ pipeline {
         stage('Build Frontend Docker Image') {
             steps {
                 dir('clear-slate-blog') {
-                    sh 'docker build -t $FRONTEND_IMAGE:latest .'
+                    sh 'sudo docker build -t $FRONTEND_IMAGE:latest .'
                 }
             }
         }
@@ -55,13 +55,13 @@ pipeline {
 
         stage('Push Backend Image') {
             steps {
-                sh 'docker push $BACKEND_IMAGE:latest'
+                sh 'sudo docker push $BACKEND_IMAGE:latest'
             }
         }
 
         stage('Push Frontend Image') {
             steps {
-                sh 'docker push $FRONTEND_IMAGE:latest'
+                sh 'sudo docker push $FRONTEND_IMAGE:latest'
             }
         }
 
