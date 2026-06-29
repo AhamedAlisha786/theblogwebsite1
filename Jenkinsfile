@@ -79,6 +79,8 @@ pipeline {
 
                     sudo kubectl apply -f k8/frontend-deployment.yaml
                     sudo kubectl apply -f k8/frontend-service.yaml
+
+                    sudo kubectl apply -f k8/ingress.yaml
                 '''
             }
         }
