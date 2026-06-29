@@ -74,11 +74,11 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''
-                    sudo kubectl apply -f k8s/backend-deployment.yaml
-                    sudo kubectl apply -f k8s/backend-service.yaml
+                    sudo kubectl apply -f k8/backend-deployment.yaml
+                    sudo kubectl apply -f k8/backend-service.yaml
 
-                    sudo kubectl apply -f k8s/frontend-deployment.yaml
-                    sudo kubectl apply -f k8s/frontend-service.yaml
+                    sudo kubectl apply -f k8/frontend-deployment.yaml
+                    sudo kubectl apply -f k8/frontend-service.yaml
                 '''
             }
         }
