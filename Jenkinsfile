@@ -95,9 +95,9 @@ pipeline {
         stage('Verify Deployment') {
             steps {
                 sh '''
-                    kubectl get pods
-                    kubectl get deployments
-                    kubectl get services
+                    sudo kubectl get pods
+                    sudo kubectl get deployments
+                    sudo kubectl get services
                 '''
             }
         }
