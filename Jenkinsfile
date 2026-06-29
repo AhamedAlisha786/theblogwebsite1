@@ -3,8 +3,11 @@ pipeline {
 
     environment {
         DOCKER_HUB_USERNAME = "shaikahamedalisha"
+
         BACKEND_IMAGE = "${DOCKER_HUB_USERNAME}/devoops-backend"
         FRONTEND_IMAGE = "${DOCKER_HUB_USERNAME}/devoops-frontend"
+
+        IMAGE_TAG = "latest"
     }
 
     stages {
@@ -20,7 +23,7 @@ pipeline {
             steps {
                 dir('Blog_website') {
                     sh '''
-                        sudo docker build -t $BACKEND_IMAGE:latest .
+                        sudo docker build -t $BACKEND_IMAGE:$IMAGE_TAG .
                     '''
                 }
             }
@@ -30,7 +33,7 @@ pipeline {
             steps {
                 dir('clear-slate-blog') {
                     sh '''
-                        sudo docker build -t $FRONTEND_IMAGE:latest .
+                        sudo docker build -t $FRONTEND_IMAGE:$IMAGE_TAG .
                     '''
                 }
             }
@@ -38,14 +41,15 @@ pipeline {
 
         stage('Docker Login') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )
+                ]) {
                     sh '''
-                        echo "$DOCKER_PASS" | sudo docker login \
-                        -u "$DOCKER_USER" --password-stdin
+                        echo "$DOCKER_PASS" | sudo docker login -u "$DOCKER_USER" --password-stdin
                     '''
                 }
             }
@@ -54,7 +58,7 @@ pipeline {
         stage('Push Backend Image') {
             steps {
                 sh '''
-                    sudo docker push $BACKEND_IMAGE:latest
+                    sudo docker push $BACKEND_IMAGE:$IMAGE_TAG
                 '''
             }
         }
@@ -62,19 +66,51 @@ pipeline {
         stage('Push Frontend Image') {
             steps {
                 sh '''
-                    sudo docker push $FRONTEND_IMAGE:latest
+                    sudo docker push $FRONTEND_IMAGE:$IMAGE_TAG
+                '''
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh '''
+                    kubectl apply -f k8s/backend-deployment.yaml
+                    kubectl apply -f k8s/backend-service.yaml
+
+                    kubectl apply -f k8s/frontend-deployment.yaml
+                    kubectl apply -f k8s/frontend-service.yaml
+                '''
+            }
+        }
+
+        // stage('Restart Deployments') {
+        //     steps {
+        //         sh '''
+        //             kubectl rollout restart deployment backend-deployment
+        //             kubectl rollout restart deployment frontend-deployment
+        //         '''
+        //     }
+        // }
+
+        stage('Verify Deployment') {
+            steps {
+                sh '''
+                    kubectl get pods
+                    kubectl get deployments
+                    kubectl get services
                 '''
             }
         }
     }
 
     post {
+
         always {
             sh 'sudo docker logout'
         }
 
         success {
-            echo 'Docker Images Successfully Pushed!'
+            echo 'CI/CD Pipeline Executed Successfully!'
         }
 
         failure {
