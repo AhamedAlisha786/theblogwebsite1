@@ -8,7 +8,7 @@ import axiosInstance from './axiosInstances';
 
 export const addPost = async({title,category,coverImage,content,authorId})=>{
     try{
-        const response = await axiosInstance.post('/api/posts/create', { title:title, category:category, coverImage:coverImage, content:content, authorId:authorId });
+        const response = await axiosInstance.post('/posts/create', { title:title, category:category, coverImage:coverImage, content:content, authorId:authorId });
         return response.data;
     }
     catch(error){
@@ -19,7 +19,7 @@ export const addPost = async({title,category,coverImage,content,authorId})=>{
 
 export const getData = async()=>{
     try{
-        const response = await axiosInstance.get('/api/posts/getAll');
+        const response = await axiosInstance.get('/posts/getAll');
         return response.data;
     }
     catch(error){
@@ -31,7 +31,7 @@ export const getData = async()=>{
 export const getUserData = async()=>{
     try{
         const userId = localStorage.getItem("currentUser_id");
-        const response = await axiosInstance.get(`/api/posts/${userId}`);
+        const response = await axiosInstance.get(`/posts/${userId}`);
         return response.data;
     }
     catch(error){
