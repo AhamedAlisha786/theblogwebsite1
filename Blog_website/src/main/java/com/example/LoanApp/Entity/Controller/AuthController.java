@@ -24,7 +24,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:8081",allowCredentials = "true") // Adjust the origin as needed for your frontend
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 	private UserRepository userRepository;
 	private BCryptPasswordEncoder passwordEncoder;
