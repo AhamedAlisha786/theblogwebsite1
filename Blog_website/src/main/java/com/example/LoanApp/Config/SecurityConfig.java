@@ -52,13 +52,17 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:8081"));
+        config.setAllowedOriginPatterns(List.of(
+            "http://localhost:*",
+            "http://3.109.214.113:*"
+        ));
+        config.setAllowCredentials(true);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/auth/**", config);
+        source.registerCorsConfiguration("/api/auth/**", config);
         source.registerCorsConfiguration("/api/posts/**", config);
         source.registerCorsConfiguration("/refresh", config);
         source.registerCorsConfiguration("/api/likes/**",config);
@@ -73,7 +77,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authenticationProvider(authProvider())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/posts/getAll").permitAll()
                 .requestMatchers("/api/posts/**").authenticated()
                 .requestMatchers("/refresh").authenticated()
