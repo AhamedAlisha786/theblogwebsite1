@@ -21,7 +21,7 @@ import com.example.LoanApp.Service.PostService;
 
 import jakarta.validation.Valid;
 
-@CrossOrigin(origins = "http://localhost:8081") // Adjust the origin as needed for your frontend
+// @CrossOrigin(origins = "http://localhost:8081") // Adjust the origin as needed for your frontend
 @RequestMapping("/api/posts")
 @RestController
 public class PostController {
