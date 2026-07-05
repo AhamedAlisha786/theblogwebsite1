@@ -82,7 +82,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/posts/**").authenticated()
                 .requestMatchers("/refresh").authenticated()
                 .requestMatchers("/api/comments/**").authenticated()
-                .requestMatchers("api/likes/**").authenticated()
+                .requestMatchers("/api/likes/**").authenticated()
+                .requestMatchers("/api/actuator/**").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
