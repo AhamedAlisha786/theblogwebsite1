@@ -5,25 +5,61 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-images:
-    name: Build Frontend and Backend Images
+  build-and-push:
+    name: Build and Push Images to ECR
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
       - name: Build Frontend Docker Image
+        env:
+          ECR_REGISTRY: 742851378481.dkr.ecr.ap-south-1.amazonaws.com
+          ECR_REPOSITORY: repo/blog
+          IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build \
-            -t blog-frontend:${{ github.sha }} \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:frontend-$IMAGE_TAG \
             ./clear-slate-blog
 
+      - name: Push Frontend Image
+        env:
+          ECR_REGISTRY: 742851378481.dkr.ecr.ap-south-1.amazonaws.com
+          ECR_REPOSITORY: repo/blog
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker push \
+            $ECR_REGISTRY/$ECR_REPOSITORY:frontend-$IMAGE_TAG
+
       - name: Build Backend Docker Image
+        env:
+          ECR_REGISTRY: 742851378481.dkr.ecr.ap-south-1.amazonaws.com
+          ECR_REPOSITORY: repo/blog
+          IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build \
-            -t blog-backend:${{ github.sha }} \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:backend-$IMAGE_TAG \
             ./Blog_website
+
+      - name: Push Backend Image
+        env:
+          ECR_REGISTRY: 742851378481.dkr.ecr.ap-south-1.amazonaws.com
+          ECR_REPOSITORY: repo/blog
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker push \
+            $ECR_REGISTRY/$ECR_REPOSITORY:backend-$IMAGE_TAG
 
       - name: Verify Docker Images
         run: docker images
